@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "Citeorder",
+  "version": "0.1.0",
+  "description": "Reorders footnotes in GitHub's README.md text editor",
+  "icons": {
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "activeTab",
+    "offscreen"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "host_permissions": [
+    "https://github.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://github.com/*/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "wasm/citeorder.wasm",
+        "wasm/citeorder.js",
+        "page-bridge.js"
+      ],
+      "matches": ["https://github.com/*"]
+    }
+  ]
+}
