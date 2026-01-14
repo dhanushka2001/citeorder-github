@@ -1,0 +1,57 @@
+name: Update WASM from citeorder release
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [citeorder-release]
+
+jobs:
+  update-wasm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout extension repo
+        uses: actions/checkout@v4
+
+      - name: Get latest stable citeorder release
+        id: release
+        uses: robinraju/release-downloader@v1.11
+        with:
+          repository: dhanushka2001/citeorder
+          latest: true
+          preRelease: false
+          download: false
+
+      - name: Fail if no stable release found
+        if: steps.release.outputs.tag_name == ''
+        run: |
+          echo "No stable citeorder release found"
+          exit 0
+
+      - name: Download citeorder WASM assets
+        uses: robinraju/release-downloader@v1.11
+        with:
+          repository: dhanushka2001/citeorder
+          tag: ${{ steps.release.outputs.tag_name }}
+          fileName: |
+            citeorder.js
+            citeorder.wasm
+          out-file-path: wasm
+
+      - name: Commit updated WASM files
+        run: |
+          VERSION="${{ steps.release.outputs.tag_name }}"
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add wasm/citeorder.js wasm/citeorder.wasm
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git commit -m "Update WASM to citeorder ${VERSION}"
+          git push
+

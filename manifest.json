@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Citeorder",
+  "name": "Citeorder for GitHub",
   "version": "0.1.0",
   "description": "Reorders footnotes in GitHub's README.md text editor",
   "icons": {
