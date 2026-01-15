@@ -7,8 +7,8 @@
     "128": "icons/icon128.png"
   },
   "permissions": [
-    "activeTab",
-    "offscreen"
+    "offscreen",
+    "declarativeContent"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
@@ -23,7 +23,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://github.com/*/*"
+        "https://github.com/*"
       ],
       "js": ["content.js"],
       "run_at": "document_idle"
@@ -38,5 +38,6 @@
       ],
       "matches": ["https://github.com/*"]
     }
-  ]
+  ],
+  "homepage_url": "https://github.com/dhanushka2001/citeorder-github"
 }

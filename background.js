@@ -51,4 +51,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+// Enable/disable the action per tab
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.action.disable(); // default: grey everywhere
+
+  chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
+    chrome.declarativeContent.onPageChanged.addRules([
+      {
+        conditions: [
+          new chrome.declarativeContent.PageStateMatcher({
+            pageUrl: {
+              hostEquals: "github.com",
+              pathContains: "/edit/"
+            }
+          })
+        ],
+        actions: [new chrome.declarativeContent.ShowAction()]
+      }
+    ]);
+  });
+});
+
 console.log('🚀 Citeorder background service worker loaded');

@@ -13,7 +13,7 @@ jobs:
       - name: Checkout extension repo
         uses: actions/checkout@v4
 
-      # 1️⃣. Get latest stable citeorder release
+      # 1. Get latest stable citeorder release
       - name: Get latest stable citeorder release
         id: release
         uses: robinraju/release-downloader@v1.11
@@ -29,7 +29,7 @@ jobs:
           echo "No stable citeorder release found"
           exit 0
 
-      # 2️⃣. Download WASM zip asset
+      # 2. Download WASM zip asset
       - name: Download citeorder WASM zip
         uses: robinraju/release-downloader@v1.11
         with:
@@ -38,7 +38,7 @@ jobs:
           fileName: citeorder-wasm-*.zip
           out-file-path: /tmp/citeorder-wasm
 
-      # 3️⃣. Extract WASM files
+      # 3. Extract WASM files
       - name: Extract WASM files
         run: |
           unzip -o /tmp/citeorder-wasm/citeorder-wasm-*.zip -d /tmp/citeorder-wasm
@@ -46,7 +46,7 @@ jobs:
           cp /tmp/citeorder-wasm/citeorder.js wasm/
           cp /tmp/citeorder-wasm/citeorder.wasm wasm/
 
-      # 4️⃣. Commit if changed
+      # 4. Commit if changed
       - name: Commit updated WASM files
         run: |
           VERSION="${{ steps.release.outputs.tag_name }}"

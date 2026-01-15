@@ -1,0 +1,44 @@
+name: Release Citeorder Github Extension
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-zip:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+      - uses: actions/checkout@v4
+
+      - name: Build extension zip
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          mkdir -p dist
+          zip -r dist/citeorder-github-extension-$VERSION.zip \
+            manifest.json \
+            background.js \
+            content.js \
+            page-bridge.js \
+            offscreen.js \
+            offscreen.html \
+            wasm/ \
+            icons/ \
+            LICENSE
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/citeorder-github-extension-*.zip
+          tag_name: ${{ github.ref_name }}
+          body: "Automated release of citeorder-github ${{ github.ref_name }}."
+          prerelease: ${{ contains(github.ref_name, 'test') }}
+          overwrite_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
