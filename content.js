@@ -152,12 +152,13 @@ function injectToolbar() {
   toolbar.innerHTML = `
     <button id="citeorder-run" style="
       padding: 5px 12px;
-      background: #2da44e;
+      background: #29903b;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       font-weight: 500;
+      transition: background 0.2s ease;
     ">Reorder Footnotes</button>
     <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
       <input type="checkbox" id="cite-q" style="cursor: pointer;">
@@ -169,6 +170,12 @@ function injectToolbar() {
     </label>
     <span id="citeorder-status" style="margin-left: auto; font-size: 12px; color: #666;"></span>
   `;
+
+  // Add hover effect
+  const runButton = document.getElementById("citeorder-run");
+  runButton.onmouseover = () => runButton.style.background = '#2da44e';
+  runButton.onmouseout = () => runButton.style.background = '#29903b';
+  runButton.onclick = runCiteorder;
 
   targetParent.parentElement.insertBefore(toolbar, targetParent);
   
