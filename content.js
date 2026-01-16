@@ -104,26 +104,51 @@ function processWithBackground(text, flags) {
 function isMarkdownEditor() {
   return document.querySelector(".cm-editor, textarea.js-code-textarea, file-editor") !== null;
 }
+function getGithubColor(varName, fallback) {
+  const root = document.documentElement;
+  const value = getComputedStyle(root).getPropertyValue(varName);
+  return value?.trim() || fallback;
+}
 
 // Inject the Citeorder toolbar
 function injectToolbar() {
   if (document.getElementById("citeorder-toolbar")) return;
   if (!isMarkdownEditor()) return;
-
   const targetParent = document.querySelector('.file-editor-textarea, .cm-editor, textarea.js-code-textarea');
   if (!targetParent) return;
 
   const toolbar = document.createElement("div");
   toolbar.id = "citeorder-toolbar";
+
+  // First, insert it into the DOM
+  targetParent.parentElement.insertBefore(toolbar, targetParent);
+  
+  function applyColors() {
+    const colorMode = document.documentElement.getAttribute('data-color-mode');
+    const isDark = colorMode === 'dark' || (colorMode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    
+    toolbar.style.background = isDark ? '#161b22' : '#f6f8fa';
+    toolbar.style.borderBottomColor = isDark ? '#30363d' : '#d0d7de';
+  }
+
   toolbar.style.cssText = `
     padding: 8px;
-    background: #151b23;
-    border-bottom: 1px solid #3d444d;
+    border-bottom: 1px solid;
     display: flex;
     align-items: center;
     gap: 12px;
   `;
   
+  // Apply colors immediately
+  applyColors();  
+
+  // Also reapply when theme changes
+  const observer = new MutationObserver(() => applyColors());
+  observer.observe(document.documentElement, { 
+    attributes: true, 
+    attributeFilter: ['data-color-mode', 'data-dark-theme', 'data-light-theme'] 
+  });  
+
   toolbar.innerHTML = `
     <button id="citeorder-run" style="
       padding: 5px 12px;
@@ -151,6 +176,23 @@ function injectToolbar() {
   
   console.log("✓ Citeorder toolbar injected");
 }
+
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.type !== "citeorder-status") return;
+
+  const statusEl = document.getElementById("citeorder-status");
+  if (!statusEl) return;
+
+  if (msg.status === "error") {
+    statusEl.textContent = "❌ " + msg.message;
+  } else {
+    statusEl.textContent = msg.message;
+  }
+
+  setTimeout(() => {
+    statusEl.textContent = "";
+  }, 5000);
+});
 
 // Main function: run citeorder on the editor content
 async function runCiteorder() {
@@ -211,14 +253,14 @@ async function runCiteorder() {
     if (statusEl) statusEl.textContent = "✅ Footnotes reordered!";
     console.log("✓ Citeorder completed successfully");
 
-    setTimeout(() => { if (statusEl) statusEl.textContent = ""; }, 3000);
+    setTimeout(() => { if (statusEl) statusEl.textContent = ""; }, 5000);
 
   } catch (error) {
-    console.error("✗ Citeorder error:", error);
-    if (statusEl) statusEl.textContent = "❌ " + error.message;
+    // console.error("✗ Citeorder error:", error);
+    // if (statusEl) statusEl.textContent = "❌ " + error.message;
     
     // Clear error after 5 seconds
-    setTimeout(() => { if (statusEl) statusEl.textContent = ""; }, 5000);
+    // setTimeout(() => { if (statusEl) statusEl.textContent = ""; }, 5000);
   } finally {
     if (button) button.disabled = false;
   }

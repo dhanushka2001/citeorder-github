@@ -2,6 +2,8 @@
 // Offscreen documents can load WASM without CSP issues
 
 let modulePromise = null;
+let lastMessage = "";
+let lastError = "";
 
 // Load WASM module
 async function getModule() {
@@ -24,9 +26,20 @@ async function getModule() {
           try {
             const Module = await CiteorderModule({
               locateFile: (path) => chrome.runtime.getURL('wasm/' + path),
-              print: (text) => console.log('citeorder:', text),
-              printErr: (text) => console.error('citeorder:', text),
-              noInitialRun: true // Don't call main() on startup!
+              
+	      print: (text) => {
+		if (!text.includes("Output written to")) {
+		  lastMessage = text;
+		}
+		console.log('citeorder:', text);
+	      },
+              
+	      printErr: (text) => {
+		lastError = text;
+		// console.warn('citeorder:', text);
+	      },
+              
+	      noInitialRun: true // Don't call main() on startup!
             });
             
             console.log('✅ WASM module loaded');
@@ -54,6 +67,10 @@ async function getModule() {
 
 // Process markdown with citeorder CLI
 async function processCiteorder(text, flags) {
+
+  lastMessage = "";
+  lastError = "";
+
   try {
     const Module = await getModule();
     const FS = Module.FS;
@@ -71,11 +88,29 @@ async function processCiteorder(text, flags) {
     // FS.writeFile(inputFile, text);
     console.log('📝 Wrote', normalizedText.length, 'bytes to', inputFile);
     console.log('📝 First 200 chars:', normalizedText.substring(0, 200));
-    console.log('📝 Line count:', normalizedText.split('\n').length);
+    const lineCount = normalizedText.split('\n').length;
+    console.log('📝 Line count:', lineCount);
     // console.log('📝 Wrote', text.length, 'bytes to', inputFile);
     // console.log('📝 First 200 chars:', text.substring(0, 200));
     // console.log('📝 Line count:', text.split('\n').length);
-    
+
+    // Line-count guard
+    if (lineCount > 5000) {
+      const message = `File too large (${lineCount} lines). citeorder currently supports up to 5000 lines.`;
+      
+      chrome.runtime.sendMessage({
+        type: "citeorder-status",
+        status: "error",
+        message: message
+      }); 
+      
+      return {
+	result: null,
+	error: message,
+	aborted: true
+      };
+    }
+
     // Verify file exists
     try {
       const stat = FS.stat(inputFile);
@@ -102,8 +137,8 @@ async function processCiteorder(text, flags) {
     // Capture stdout/stderr
     let stdout = '';
     let stderr = '';
-    Module.print = (t) => { stdout += t + '\n'; };
-    Module.printErr = (t) => { stderr += t + '\n'; };
+    // Module.print = (t) => { stdout += t + '\n'; };
+    // Module.printErr = (t) => { stderr += t + '\n'; };
     
     // Run CLI
     // callMain adds argv[0] automatically, so only pass actual arguments
@@ -124,6 +159,21 @@ async function processCiteorder(text, flags) {
       } else {
         throw e; // Unexpected error
       }
+    }
+
+    // send stdout/stderr to content.js
+    if (lastError) {
+      chrome.runtime.sendMessage({
+        type: "citeorder-status",
+        status: "error",
+        message: lastError
+      });
+    } else if (lastMessage) {
+      chrome.runtime.sendMessage({
+        type: "citeorder-status",
+        status: "ok",
+        message: lastMessage
+      });
     }
     
     // Read output

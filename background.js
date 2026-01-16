@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-// Enable/disable the action per tab
+// Enable/disable icon based on GitHub editor URL
 chrome.runtime.onInstalled.addListener(() => {
   chrome.action.disable(); // default: grey everywhere
 
@@ -71,5 +71,40 @@ chrome.runtime.onInstalled.addListener(() => {
     ]);
   });
 });
+
+
+{/*
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.action.disable(); // disabled by default
+});
+
+// Enable/disable icon based on GitHub editor URL
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (!tab.url || changeInfo.status !== 'complete') return;
+
+  const isGithubEditor =
+    tab.url.startsWith("https://github.com/") &&
+    tab.url.includes("/edit/");
+
+  if (isGithubEditor) {
+    chrome.action.enable(tabId);
+  } else {
+    chrome.action.disable(tabId);
+  }
+});
+*/}
+
+
+chrome.runtime.onMessage.addListener((msg, sender) => {
+  if (msg.type !== "citeorder-status") return;
+
+  // Relay to the active tab
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs[0]?.id) return;
+
+    chrome.tabs.sendMessage(tabs[0].id, msg);
+  });
+});
+
 
 console.log('🚀 Citeorder background service worker loaded');

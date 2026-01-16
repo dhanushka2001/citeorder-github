@@ -3,11 +3,17 @@
   "name": "Citeorder for GitHub",
   "version": "0.1.0",
   "description": "Reorders footnotes in GitHub's README.md text editor",
+  "action": {
+    "default_icon": {
+      "128": "icons/icon128.png"
+    }
+  },
   "icons": {
     "128": "icons/icon128.png"
   },
   "permissions": [
     "offscreen",
+    // "tabs",
     "declarativeContent"
   ],
   "content_security_policy": {
