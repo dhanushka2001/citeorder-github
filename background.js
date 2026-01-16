@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-// Enable/disable icon based on GitHub editor URL
+// Enable/disable icon based on GitHub editor URL using declarativeContent
 chrome.runtime.onInstalled.addListener(() => {
   chrome.action.disable(); // default: grey everywhere
 
@@ -78,7 +78,7 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.action.disable(); // disabled by default
 });
 
-// Enable/disable icon based on GitHub editor URL
+// Enable/disable icon based on GitHub editor URL using tabs
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (!tab.url || changeInfo.status !== 'complete') return;
 
