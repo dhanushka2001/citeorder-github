@@ -1,5 +1,5 @@
-
-<img width="640" height="320" alt="citeorder-github-logo" src="https://github.com/user-attachments/assets/d1ef63a8-7f79-4d51-8c02-fb1ae8ae5330" />
+![Logo](https://github.com/user-attachments/assets/6dda5d94-7281-4646-b62b-15ef8a7bec55#gh-dark-mode-only)
+![Logo](https://github.com/user-attachments/assets/fbd5bd1e-ab28-46bf-934b-5e81559e9e19#gh-light-mode-only)
 
 # Citeorder for GitHub
 <!--
@@ -15,7 +15,7 @@
 
 [![Google Chrome](https://img.shields.io/badge/Google%20Chrome-4285F4?style=plastic&logo=GoogleChrome&logoColor=white)](https://chromewebstore.google.com/detail/citeorder-for-github/ngddnjnjjbdclmgjpjcefdkkpgkbgfmn)
 ![WebAssembly](https://img.shields.io/badge/WebAssembly-%23654FF0.svg?style=plastic&logo=WebAssembly&logoColor=white)
-![JavaScript](https://img.shields.io/badge/Javascript-%23323330.svg?style=plastic&logo=Javascript&logoColor=%23F7DF1E)
+![JavaScript](https://img.shields.io/badge/JavaScript-%23323330.svg?style=plastic&logo=JavaScript&logoColor=%23F7DF1E)
 ![Markdown](https://img.shields.io/badge/Markdown-%23000000.svg?style=plastic&logo=markdown&logoColor=white)
 
 [Chrome Extension](https://chromewebstore.google.com/detail/citeorder-for-github/ngddnjnjjbdclmgjpjcefdkkpgkbgfmn) that adds a toolbar to GitHub's README.md text editor with a button to relabel footnotes to be in numerical order, instead of having to manually find and relabel dozens of footnotes.
